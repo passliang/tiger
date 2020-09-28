@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: gateway
+  autoconfigure:
+    exclude: org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistrationAutoConfiguration
+
+  cloud:
+    gateway:
+      routes:
+        - id : oauth
+          uri: lb://AUTH-SERVER
+          predicates:
+            - Path=/oauth/*
+        - id: user
+          uri: lb://USER
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+
+
+#默认暴露所有的节点给 adminServer 生产上谨慎使用 可增加认证
+management:
+  endpoints:
+    web:
+      exposure:
+        #暴露hystrix监控端点 hystrix.stream
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
